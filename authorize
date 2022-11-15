@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+set -eu
+
+if [ -z $MASTODON_HOST ]; then
+  echo "MASTODON_HOST is missing!"
+  exit 1
+fi
+
+if [ -z $MASTODON_CLIENT_ID ]; then
+  echo "MASTODON_CLIENT_ID is missing!"
+  exit 1
+fi
+
+if [ -z $MASTODON_CLIENT_SECRET ]; then
+  echo "MASTODON_CLIENT_SECRET is missing!"
+  exit 1
+fi
+
+if [ -z $MASTODON_API_SCOPES ]; then
+  echo "MASTODON_API_SCOPES is missing!"
+  exit 1
+fi
+
+echo "Open: https://${MASTODON_HOST}/oauth/authorize?response_type=code&client_id=${MASTODON_CLIENT_ID}&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=${MASTODON_API_SCOPE}"
+
+authorization_code=
+echo "Paste authorization code: "
+read authorization_code
+
+curl -X POST \
+	-F "client_id=${MASTODON_CLIENT_ID}" \
+	-F "client_secret=${MASTODON_CLIENT_SECRET}" \
+	-F "redirect_uri=urn:ietf:wg:oauth:2.0:oob" \
+	-F "grant_type=authorization_code" \
+    -F "scope=admin:read" \
+    -F "code=${authorization_code}" \
+	https://${MASTODON_HOST}/oauth/token 2>/dev/null | jq .
