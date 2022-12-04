@@ -13,7 +13,7 @@ def fetch_rapidblock_blocks():
         k: {
             'domain': k,
             'public_comment': compile_comment(v),
-            'severity': 'suspend',
+            'severity': 'suspend' if v['isBlocked'] else 'silence',
         }
         for k, v in r.json()['blocks'].items()
         if v['isBlocked'] is True
@@ -34,7 +34,7 @@ def fetch_peer_blocks():
             all_blocks[block['domain']] = {
                 'domain': block['domain'],
                 'public_comment': block['comment'],
-                'severity': 'suspend',
+                'severity': block['severity'],
             }
 
     return all_blocks
@@ -46,11 +46,10 @@ def load_blocklist():
         return {
             k: {
                 'domain': k,
-                'comment': compile_comment(v),
-                'severity': 'suspend',
+                'public_comment': compile_comment(v),
+                'severity': 'suspend' if v['isBlocked'] is True else 'silence',
             }
             for k, v in blocklist['blocks'].items()
-            if v['isBlocked'] is True
         }
     return {}
 
@@ -59,7 +58,7 @@ def compile_comment(block):
     comment = ''
     if block.get('reason'):
         comment += block['reason'] + ': '
-    comment += ', '.join(block['tags'])
+    comment += ', '.join(block.get('tags', []))
     return comment
 
 
@@ -101,13 +100,29 @@ def remove_blocks(blocks):
         r.raise_for_status()
         print(f'unblocked {domain}')
 
+def update_blocks(existing, new):
+    for domain, block_e in existing.items():
+        block_n = new.get(domain, None)
+        if block_n is None:
+            continue
+
+        if block_e['public_comment'] != block_n['public_comment'] or \
+            block_e['severity'] != block_n['severity']:
+
+            id_ = block_e['id']
+            r = requests.put(f'https://{host}/api/v1/admin/domain_blocks/{id_}', headers={'Authorization': auth}, json=block_n)
+            r.raise_for_status()
+            print(f'updated block for {domain}')
+
+
+
 if __name__ == '__main__':
     host = os.environ['MASTODON_HOST']
     token = os.environ['MASTODON_TOKEN']
     auth = f'Bearer {token}'
 
     allowlist = load_allowlist()
-    new_blocks = {**load_blocklist(), **fetch_peer_blocks(), **fetch_rapidblock_blocks()}
+    new_blocks = {**fetch_peer_blocks(), **fetch_rapidblock_blocks(), **load_blocklist()}
     existing_blocks = existing_blocked_domains(host, auth)
 
     create = new_blocks.keys() - existing_blocks.keys() - allowlist
@@ -115,3 +130,4 @@ if __name__ == '__main__':
 
     create_blocks([v for (k, v) in new_blocks.items() if k in create])
     remove_blocks([v for (k, v) in existing_blocks.items() if k in remove])
+    update_blocks(existing_blocks, new_blocks)
