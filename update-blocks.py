@@ -1,8 +1,23 @@
 #!/usr/bin/env python
 
+import json
 import os
 
 import requests
+
+
+def fetch_rapidblock_blocks():
+    r = requests.get('https://rapidblock.org/blocklist.json')
+    r.raise_for_status()
+    return {
+        k: {
+            'domain': k,
+            'public_comment': compile_comment(v),
+            'severity': 'suspend',
+        }
+        for k, v in r.json()['blocks'].items()
+        if v['isBlocked'] is True
+    }
 
 
 def fetch_peer_blocks():
@@ -16,13 +31,36 @@ def fetch_peer_blocks():
         blocks = [b for b in r.json() if '*' not in b['domain']]
 
         for block in blocks:
-            comment = block['comment']
             all_blocks[block['domain']] = {
                 'domain': block['domain'],
-                'comment': f'Imported from {peer}: {comment}'
+                'public_comment': block['comment'],
+                'severity': 'suspend',
             }
 
     return all_blocks
+
+
+def load_blocklist():
+    with open('data/blocklist.json') as file:
+        blocklist = json.load(file)
+        return {
+            k: {
+                'domain': k,
+                'comment': compile_comment(v),
+                'severity': 'suspend',
+            }
+            for k, v in blocklist['blocks'].items()
+            if v['isBlocked'] is True
+        }
+    return {}
+
+
+def compile_comment(block):
+    comment = ''
+    if block.get('reason'):
+        comment += block['reason'] + ': '
+    comment += ', '.join(block['tags'])
+    return comment
 
 
 def existing_blocked_domains(host, auth):
@@ -40,14 +78,6 @@ def existing_blocked_domains(host, auth):
     return blocked_domains
 
 
-def load_blocklist():
-    blocklist_f = open('data/blocklist', 'r')
-    return {
-        h.strip(): {'domain': h.strip(), 'comment': ''}
-        for h in blocklist_f.readlines()
-    }
-
-
 def load_allowlist():
     allowlist_f = open('data/allowlist', 'r')
     return {h.strip() for h in allowlist_f.readlines()}
@@ -56,14 +86,7 @@ def load_allowlist():
 def create_blocks(blocks):
     for block in blocks:
         domain = block['domain']
-        body = {
-            'domain': domain,
-            'severity': 'suspend',
-        }
-        if block['comment']:
-            body['public_comment'] = block['comment']
-
-        r = requests.post(f'https://{host}/api/v1/admin/domain_blocks', headers={'Authorization': auth}, json=body)
+        r = requests.post(f'https://{host}/api/v1/admin/domain_blocks', headers={'Authorization': auth}, json=block)
         if r.status_code == 422 and r.json().get('existing_domain_block'):
             continue
         r.raise_for_status()
@@ -84,7 +107,7 @@ if __name__ == '__main__':
     auth = f'Bearer {token}'
 
     allowlist = load_allowlist()
-    new_blocks = {**load_blocklist(), **fetch_peer_blocks()}
+    new_blocks = {**load_blocklist(), **fetch_peer_blocks(), **fetch_rapidblock_blocks()}
     existing_blocks = existing_blocked_domains(host, auth)
 
     create = new_blocks.keys() - existing_blocks.keys() - allowlist
