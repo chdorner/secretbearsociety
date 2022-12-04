@@ -1,11 +1,7 @@
 {
     "blocks": {
-        "freeantlantis.com": {
-            "isBlocked": true,
-            "reason": "",
-            "tags": [
-                "misinformation"
-            ]
+        "journa.host": {
+            "isBlocked": false
         }
     }
 }
