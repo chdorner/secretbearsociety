@@ -1,0 +1,19 @@
+{
+    "FakeRelayUrl": "https://fakerelay.gervas.io",
+    "FakeRelayApiKey": "::API_KEY::",
+    "Tags": [
+        "FediBlock",
+        "DogsOfMastodon"
+    ],
+    "Sites": [
+        {
+            "Host": "hachyderm.io",
+            "SiteSpecificTags": [
+                "MechanicalKeyboard"
+            ]
+        },
+        {
+            "Host": "mastodon.social"
+        }
+    ]
+}

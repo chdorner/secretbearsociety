@@ -1,0 +1,19 @@
+name: moar
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+
+jobs:
+  moar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup config
+        env:
+          FAKE_RELAY_API_KEY: ${{ secrets.FAKE_RELAY_API_KEY }}
+        run: |
+          cat data/moar.json | sed "s|::API_KEY::|${FAKE_RELAY_API_KEY}|" > /tmp/moar.json
+      - uses: chdorner/GetMoarFediverse-action@main
+        with:
+          config_file: /tmp/moar.json
