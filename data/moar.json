@@ -1,6 +1,5 @@
 {
     "FakeRelayUrl": "https://fakerelay.gervas.io",
-    "FakeRelayApiKey": "::API_KEY::",
     "Tags": [
         "DogsOfMastodon",
         "MechanicalKeyboard"
