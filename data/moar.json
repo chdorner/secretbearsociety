@@ -1,8 +1,7 @@
 {
     "FakeRelayUrl": "https://fakerelay.gervas.io",
     "Tags": [
-        "DogsOfMastodon",
-        "Psychogeography"
+        "DogsOfMastodon"
     ],
     "Sites": [
         {
@@ -12,7 +11,10 @@
             ]
         },
         {
-            "Host": "mastodon.social"
+            "Host": "mastodon.social",
+            "SiteSpecificTags": [
+                "Psychogeography"
+            ]
         }
     ]
 }
