@@ -2,11 +2,14 @@
     "FakeRelayUrl": "https://fakerelay.gervas.io",
     "Tags": [
         "DogsOfMastodon",
-        "MechanicalKeyboard"
+        "Psychogeography"
     ],
     "Sites": [
         {
-            "Host": "hachyderm.io"
+            "Host": "hachyderm.io",
+            "SiteSpecificTags": [
+                "MechanicalKeyboard"
+            ]
         },
         {
             "Host": "mastodon.social"
