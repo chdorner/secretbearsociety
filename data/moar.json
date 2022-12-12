@@ -2,7 +2,8 @@
     "FakeRelayUrl": "https://fakerelay.gervas.io",
     "Tags": [
         "DogsOfMastodon",
-        "TodaysTunes"
+        "TodaysTunes",
+        "BookWyrm"
     ],
     "Sites": [
         {
