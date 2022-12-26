@@ -1,22 +1,11 @@
 {
     "FakeRelayUrl": "https://fakerelay.gervas.io",
     "Tags": [
+        "BookWyrm",
         "DogsOfMastodon",
-        "TodaysTunes",
-        "BookWyrm"
+        "MechanicalKeyboard",
+        "Psychogeography",
+        "TodaysTunes"
     ],
-    "Sites": [
-        {
-            "Host": "hachyderm.io",
-            "SiteSpecificTags": [
-                "MechanicalKeyboard"
-            ]
-        },
-        {
-            "Host": "mastodon.social",
-            "SiteSpecificTags": [
-                "Psychogeography"
-            ]
-        }
-    ]
+    "Instances": ["hachyderm.io", "mastodon.social"]
 }
