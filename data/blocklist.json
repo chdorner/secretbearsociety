@@ -2,6 +2,10 @@
     "blocks": {
         "journa.host": {
             "isBlocked": false
+        },
+        "mastinator.com": {
+            "isBlocked": true,
+            "reason": "unwanted profile mirroring"
         }
     }
 }
