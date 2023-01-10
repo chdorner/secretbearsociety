@@ -3,9 +3,7 @@
     "Tags": [
         "BookWyrm",
         "DogsOfMastodon",
-        "MechanicalKeyboard",
-        "Psychogeography",
-        "TodaysTunes"
+        "Psychogeography"
     ],
     "Instances": ["hachyderm.io", "mastodon.social"]
 }
